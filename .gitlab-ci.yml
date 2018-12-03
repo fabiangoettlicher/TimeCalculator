@@ -1,0 +1,24 @@
+stages:
+  - test
+  - build
+  - deploy
+
+test:
+  stage: test
+  script:
+    - ./gradlew test
+  tags:
+    - android
+
+build:
+  stage: build
+  script:
+    - ./gradlew :app:assembleRelease :app:bundleRelease
+  tags:
+    - android-release
+  artifacts:
+    paths:
+      - app/build/outputs/apk/*/release/*.apk
+      - app/build/outputs/bundle/*/*.aab
+  only:
+    - tags

@@ -1,0 +1,179 @@
+apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+apply plugin: "kotlin-android-extensions"
+apply plugin: 'kotlin-kapt'
+apply plugin: 'com.akaita.android.easylauncher'
+
+android {
+    compileSdkVersion 28
+    signingConfigs {
+        release {
+            keyAlias 'mykeyalias'
+            keyPassword 'mykeypassword'
+            storeFile file('../keystore.jks')
+            storePassword 'mykeystorepassword'
+        }
+    }
+    defaultConfig {
+        applicationId "com.fagoett.timecalc"
+        minSdkVersion 21
+        targetSdkVersion 28
+        versionCode 1
+        versionName "1.0.0"
+        vectorDrawables.useSupportLibrary = true
+        setProperty("archivesBaseName", "TimeCalculator-v$versionName-b$versionCode")
+    }
+    buildTypes {
+        release {
+            signingConfig signingConfigs.release
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles 'proguard-rules.pro'
+        }
+    }
+    flavorDimensions "backend"
+    productFlavors {
+        devBackend {
+            applicationIdSuffix ".dev"
+            resValue "string", "app_name", "TimeCalculator Dev"
+            resValue "string", "leak_canary_display_activity_label", "TimeCalculator Leaks"
+            buildConfigField "String", "BASE_URL", "\"https://restcountries.eu/\""
+            dimension "backend"
+        }
+        productionBackend {
+            resValue "string", "app_name", "TimeCalculator"
+            buildConfigField "String", "BASE_URL", "\"https://restcountries.eu/\""
+            dimension "backend"
+        }
+    }
+    dataBinding {
+        enabled = true
+    }
+    lintOptions {
+        abortOnError false
+    }
+    testOptions {
+        unitTests.returnDefaultValues = true
+    }
+    packagingOptions {
+
+    }
+    sourceSets {
+        main.java.srcDirs += 'src/main/kotlin'
+        test.java.srcDirs += 'src/test/kotlin'
+        androidTest.java.srcDirs += 'src/androidTest/kotlin'
+    }
+}
+
+
+androidExtensions {
+    experimental = true
+}
+
+
+dependencies {
+
+    /**
+     * Local
+     */
+
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+
+    /**
+     * UI
+     */
+
+    implementation 'androidx.appcompat:appcompat:1.0.0'
+    implementation 'androidx.fragment:fragment:1.0.0'
+    implementation 'com.google.android.material:material:1.0.0'
+    implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
+
+
+    /**
+     * Networking
+     */
+
+    implementation 'com.google.code.gson:gson:2.8.5'
+
+    implementation "com.squareup.retrofit2:retrofit:$retrofitVersion"
+    implementation "com.squareup.retrofit2:converter-gson:$retrofitVersion"
+    implementation "com.squareup.retrofit2:adapter-rxjava2:$retrofitVersion"
+
+    implementation "com.squareup.okhttp3:okhttp:$okHttpVersion"
+    implementation "com.squareup.okhttp3:logging-interceptor:$okHttpVersion"
+
+
+    /**
+     * Dependency Injection
+     */
+
+    kapt "com.google.dagger:dagger-compiler:$daggerVersion"
+    implementation "com.google.dagger:dagger:$daggerVersion"
+
+    /**
+     * Rx
+     */
+
+    implementation 'io.reactivex.rxjava2:rxjava:2.2.3'
+    implementation 'io.reactivex.rxjava2:rxandroid:2.1.0'
+    implementation 'io.reactivex.rxjava2:rxkotlin:2.3.0'
+
+    /**
+     * Utils
+     */
+
+    implementation 'com.jakewharton.timber:timber:4.7.1'
+
+    debugImplementation 'com.squareup.leakcanary:leakcanary-android:1.6.2'
+    releaseImplementation 'com.squareup.leakcanary:leakcanary-android-no-op:1.6.2'
+
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"
+
+
+    /**
+     * Testing
+     */
+
+    testImplementation 'junit:junit:4.12'
+    testImplementation "org.mockito:mockito-core:$mockitoVersion"
+    testImplementation "org.powermock:powermock-module-junit4:$powerMockVersion"
+    testImplementation "org.powermock:powermock-module-junit4-rule:$powerMockVersion"
+    testImplementation "org.powermock:powermock-api-mockito2:$powerMockVersion"
+    testImplementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"
+    testImplementation "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion"
+    testImplementation "com.nhaarman:mockito-kotlin-kt1.1:1.5.0"
+    testImplementation "com.google.code.findbugs:jsr305:3.0.2"
+
+    androidTestImplementation 'com.android.support.test:runner:1.0.2'
+    androidTestImplementation 'com.android.support.test:rules:1.0.2'
+    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+    androidTestImplementation 'com.android.support.test.espresso:espresso-intents:3.0.2'
+    androidTestImplementation "org.mockito:mockito-android:$mockitoVersion"
+    androidTestImplementation('com.android.support.test.espresso:espresso-contrib:3.0.2') {
+        exclude group: 'com.android.support', module: 'appcompat'
+        exclude group: 'com.android.support', module: 'support-v4'
+        exclude group: 'com.android.support', module: 'appcompat-v7'
+        exclude group: 'com.android.support', module: 'design'
+        exclude group: 'com.android.support', module: 'recyclerview-v7'
+    }
+    androidTestImplementation "com.squareup.okhttp3:okhttp:$okHttpVersion"
+    androidTestImplementation 'com.jakewharton.espresso:okhttp3-idling-resource:1.0.0'
+    androidTestImplementation "com.google.code.findbugs:jsr305:3.0.2"
+
+}
+
+
+easylauncher {
+    iconNames "@mipmap/ic_launcher_foreground"
+    foregroundIconNames "@mipmap/ic_launcher_foreground"
+
+    defaultFlavorNaming = true
+
+    //For customization see: https://github.com/akaita/easylauncher-gradle-plugin#usage.
+    buildTypes {
+        debug {
+            filters = customColorRibbonFilter("debug", "#ffffff", "#47BAF2")
+        }
+        release {}
+    }
+}
