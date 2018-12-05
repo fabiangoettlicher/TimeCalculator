@@ -16,6 +16,9 @@ package com.fagoett.timecalc.util.extensions
 
 import android.os.Bundle
 import android.os.Parcelable
+import android.text.Editable
+import android.text.TextWatcher
+import android.widget.EditText
 import androidx.fragment.app.Fragment
 import com.fagoett.timecalc.ui.base.view.MvvmView
 import com.fagoett.timecalc.ui.base.viewmodel.MvvmViewModel
@@ -48,3 +51,18 @@ fun <V : MvvmView> MvvmViewModel<V>.attachViewOrThrowRuntimeException(view: Mvvm
 // Fragment
 
 inline fun Fragment.withArgs(argsFun: Bundle.() -> Unit) = apply { arguments = Bundle().apply(argsFun) }
+
+// EditText
+
+fun EditText.onTextChange(oTC: (String) -> Unit) {
+    this.addTextChangedListener(object : TextWatcher{
+        override fun afterTextChanged(s: Editable?) {
+            oTC.invoke(s.toString())
+        }
+
+        override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int){}
+
+        override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+
+    })
+}

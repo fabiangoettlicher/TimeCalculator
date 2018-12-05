@@ -14,14 +14,20 @@
 
 package com.fagoett.timecalc.ui.main
 
+import android.content.Context
 import android.os.Bundle
+import android.widget.Toast
+import androidx.databinding.Bindable
 import com.fagoett.timecalc.R
 import com.fagoett.timecalc.databinding.ActivityMainBinding
+import com.fagoett.timecalc.injection.qualifier.ActivityContext
 import com.fagoett.timecalc.injection.scopes.PerActivity
 import com.fagoett.timecalc.ui.base.BaseActivity
 import com.fagoett.timecalc.ui.base.view.MvvmView
+import com.fagoett.timecalc.ui.base.viewmodel.BaseStateViewModel
 import com.fagoett.timecalc.ui.base.viewmodel.BaseViewModel
 import com.fagoett.timecalc.ui.base.viewmodel.MvvmViewModel
+import com.fagoett.timecalc.util.extensions.onTextChange
 import javax.inject.Inject
 
 
@@ -29,7 +35,13 @@ interface MainMvvm {
 
     interface View : MvvmView
 
-    interface ViewModel : MvvmViewModel<View>
+    interface ViewModel : MvvmViewModel<View> {
+        @get:Bindable
+        var timeInput: String
+        var calculatedTime: String
+        fun onCalcClick()
+        fun applyPattern(string: String)
+    }
 }
 
 
@@ -38,8 +50,9 @@ class MainActivity : BaseActivity<ActivityMainBinding, MainMvvm.ViewModel>(), Ma
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setAndBindContentView(savedInstanceState, R.layout.activity_main)
-
         setSupportActionBar(binding.toolbar)
+        //Pattern während des schreibens ändern
+        //TODO: binding.etTime.onTextChange { viewModel.applyPattern(it) }
     }
 
 }
@@ -48,5 +61,23 @@ class MainActivity : BaseActivity<ActivityMainBinding, MainMvvm.ViewModel>(), Ma
 @PerActivity
 class MainViewModel
 @Inject
-constructor() : BaseViewModel<MainMvvm.View>(), MainMvvm.ViewModel
+constructor(@ActivityContext context: Context) : BaseViewModel<MainMvvm.View>(), MainMvvm.ViewModel {
+    //Edit Text AccessObject
+    override var timeInput: String = ""
+
+    //Text View AccessObject
+    override var calculatedTime: String = ""
+
+    override fun applyPattern(string: String) {
+        //TODO:
+    }
+
+    override fun onCalcClick() {
+        val splittedTimeInput = timeInput.split(":")
+        val calculatedHours = splittedTimeInput[0].toDouble() + (splittedTimeInput[1].toDouble() / 60)
+        calculatedTime = "${"%.2f".format(calculatedHours)} Hours"
+        notifyChange()
+    }
+
+}
 

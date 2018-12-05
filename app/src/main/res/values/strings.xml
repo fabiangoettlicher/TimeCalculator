@@ -1,2 +1,5 @@
 <resources>
+    <string name="header">Timetrackingtool for TA</string>
+    <string name="hint_enter_time_to_calc">Enter hh:mm</string>
+    <string name="calc">Calculate</string>
 </resources>
